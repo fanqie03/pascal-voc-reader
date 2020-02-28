@@ -37,9 +37,12 @@ class Reader:
         tree = ET.parse(str(xml_path))
         root = tree.getroot()
         size = root.find('size')
-        width = int(size.find('width').text)
-        height = int(size.find('height').text)
-        depth = int(size.find('depth').text)
+        if size:
+            width = int(size.find('width').text)
+            height = int(size.find('height').text)
+            depth = int(size.find('depth').text)
+        else:
+            width, height, depth = -1, -1, -1
 
         for obj in root.findall('object'):
             name = obj.find('name').text
