@@ -24,7 +24,6 @@ class Reader:
         self.df['trainval'] = self.df.stem.isin(train_val_array)
         self.df['test'] = self.df.stem.isin(test_array)
 
-
     def parse_xml(self, xml_root):
         ret = []
         for i in tqdm(xml_root.glob('*.xml')):
@@ -54,10 +53,13 @@ class Reader:
                 int(float(bnd_box.find('xmax').text)),
                 int(float(bnd_box.find('ymax').text))
             ]
+            h, w = bbox[3]-bbox[1], bbox[2]-bbox[0]
+            ratio = h / w
             ret.append(dict(name=name, difficult=difficult,
                 x1=bbox[0], y1=bbox[1], x2=bbox[2], y2=bbox[3],
                 filename=xml_path.name, stem=xml_path.stem,
-                width=width, height=height, depth=depth))
+                width=width, height=height, depth=depth,
+                h=h, w=w, ratio=ratio))
         return ret
 
     def parse_txt(self, txt_root):
@@ -67,12 +69,12 @@ class Reader:
         train_val_array=self.parse_single_txt(txt_root / 'trainval.txt')
         return train_array, val_array, train_val_array, test_array
 
-
     def parse_single_txt(self, txt_path):
         if not os.path.exists(txt_path):
             return []
         with open(txt_path) as f:
             return list(f.readlines())
+
 
 if __name__ == '__main__':
     reader = Reader('C:\\Users\\mengf\\datasets\\mask_detecting\\VOCdevkit\\VOC2020')
